@@ -1,9 +1,9 @@
 const express = require("express");
-const PaymentController = require("../controllers/payment.controller");
+const paymentController = require("../controllers/payment.controller");
 
 const router = express.Router();
 
-router.post("/getTokenPayPal", PaymentController.getPayPalAccessToken);
-router.post("/checkout", PaymentController.createPayment);
-router.get("/checkStatus", PaymentController.checkStatus);
+router.post("/getTokenPayPal", paymentController.getPayPalAccessToken);
+router.post("/checkout", paymentController.createPayment);
+router.get("/checkStatus", paymentController.checkStatus);
 module.exports = router;

@@ -14,12 +14,13 @@ app.use(
 const PORT = 3000;
 const specialRouter = require("./routers/specialty.router");
 const paymentRouter = require("./routers/payment.router");
+const mailRouter = require("./routers/mail.router");
+const authenRouter = require("./routers/authen.router");
 
 app.use("/api/v1/specialty", specialRouter);
 app.use("/api/v1/payment", paymentRouter);
-app.get("/complete_order", (req, res) => {
-  res.status(200).json("complete_order");
-});
+app.use("/api/v1/mail", mailRouter);
+app.use("/api/v1/authen", authenRouter);
 app.get("/return_order", () => {
   console.log("Order returned successfully.");
 });
