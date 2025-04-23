@@ -16,11 +16,16 @@ const specialRouter = require("./routers/specialty.router");
 const paymentRouter = require("./routers/payment.router");
 const mailRouter = require("./routers/mail.router");
 const authenRouter = require("./routers/authen.router");
-
+const facilityRouter = require("./routers/facility.router");
+const doctorRouter = require("./routers/doctor.router");
+const workScheduleRouter = require("./routers/workschedule.router");
 app.use("/api/v1/specialty", specialRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/mail", mailRouter);
 app.use("/api/v1/authen", authenRouter);
+app.use("/api/v1/facility", facilityRouter);
+app.use("/api/v1/doctor", doctorRouter);
+app.use("/api/v1/workschedule", workScheduleRouter);
 app.get("/return_order", () => {
   console.log("Order returned successfully.");
 });

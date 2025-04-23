@@ -82,25 +82,60 @@ const User = {
       }
 
       const user = rows[0];
+      // Kiểm tra trạng thái tài khoản trước
+      if (user.status !== "Actived") {
+        console.log(false);
+        return { success: false, message: "Account is not activated" };
+      } else {
+        console.log(true);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+          return { success: false, message: "Invalid username or password" };
+        }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return { success: false, message: "Invalid username or password" };
+        const token = jwt.sign(
+          { id: user.id, username: user.username },
+          process.env.JWT_SECRET,
+          { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
+        );
+
+        return { success: true, token, message: "Login successfully!" };
       }
+    } catch (error) {
+      console.error("Error during login:", error.message);
+      throw error;
+    }
+  },
+  verify: async (token) => {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      if (!decoded || !decoded.username) {
+        return { success: false, message: "Invalid token payload" };
+      }
+
+      const selectSql = "SELECT * FROM user WHERE username = ?";
+      const [rows] = await conn.query(selectSql, [decoded.username]);
+
+      if (rows.length === 0) {
+        return { success: false, message: "User not found" };
+      }
+
+      const user = rows[0];
 
       if (user.status !== "Actived") {
         return { success: false, message: "Account is not activated" };
       }
 
-      const token = jwt.sign(
-        { id: user.id, username: user.username },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
-      );
-
-      return { success: true, token, message: "Login successful" };
+      return { success: true, user, message: "Token verified successfully" };
     } catch (error) {
-      console.error("Error during login:", error.message);
+      console.error("Error verifying token:", error.message);
+      if (
+        error.name === "JsonWebTokenError" ||
+        error.name === "TokenExpiredError"
+      ) {
+        return { success: false, message: "Invalid or expired token" };
+      }
       throw error;
     }
   },

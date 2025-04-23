@@ -7,7 +7,10 @@ const userController = {
       const newAccount = await User.createAccount(username, password, email);
       res.status(200).json(newAccount);
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({
+        success: false,
+        message: "Server got some error, please try again!",
+      });
     }
   },
 
@@ -16,14 +19,14 @@ const userController = {
       const token = req.params.token;
 
       const result = await User.activeAccount(token);
-
       if (!result.success) {
-        return res.status(400).json({ message: result.message });
+        return res
+          .status(400)
+          .json({ success: false, message: result.message });
       }
-
-      res.status(200).json({ message: result.message });
+      res.redirect("http://localhost:5173/dashboard");
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ success: false, message: err.message });
     }
   },
   login: async (req, res) => {
@@ -31,12 +34,29 @@ const userController = {
       const { username, password } = req.body;
       const result = await User.login(username, password);
       if (!result.success) {
-        res.status(401).json({ message: "username or password was wrong!" });
+        res.status(401).json({ message: result.message });
       } else {
         res.status(200).json(result);
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
+    }
+  },
+  verify: async (req, res) => {
+    try {
+      const token = req.params.token;
+
+      const result = await User.verify(token);
+
+      if (!result.success) {
+        return res
+          .status(401)
+          .json({ success: false, message: result.message });
+      }
+
+      res.status(200).json({ success: true, message: result.message });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
     }
   },
 };
