@@ -33,10 +33,10 @@ const doctorController = {
     try {
       const { id } = req.params; // Lấy ID từ URL params
       const result = await Doctor.getById(id);
-      if (!result.success) {
-        return res.status(404).json(result);
+      if (result.length === 0) {
+        return res.status(404).json({ success: false, message: "not found" });
       }
-      res.status(200).json(result);
+      res.status(200).json({ success: true, doctor: result });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }

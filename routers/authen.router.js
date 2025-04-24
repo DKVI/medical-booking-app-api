@@ -7,4 +7,5 @@ router.post("/register", authenController.createAccount);
 router.get("/activation/:token", authenController.activeAccount);
 router.post("/login", authenController.login);
 router.get("/verify/:token", authenController.verify);
+router.get("/getbytoken", authenController.getByToken);
 module.exports = router;

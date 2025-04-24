@@ -114,7 +114,8 @@ const User = {
         return { success: false, message: "Invalid token payload" };
       }
 
-      const selectSql = "SELECT * FROM user WHERE username = ?";
+      const selectSql =
+        "SELECT *,u.id AS user_id,pt.id AS patient_id FROM user AS u JOIN patient AS pt WHERE username = ?";
       const [rows] = await conn.query(selectSql, [decoded.username]);
 
       if (rows.length === 0) {

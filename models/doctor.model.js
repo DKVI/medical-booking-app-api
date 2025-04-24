@@ -26,6 +26,18 @@ const Doctor = {
       }
     });
   },
+  getById: async (id) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const sql =
+          "SELECT *, dt.id AS `doctorId`  FROM user INNER JOIN doctor AS dt ON user.id = dt.user_id WHERE dt.id = ?";
+        const [result] = await conn.query(sql, [id]);
+        resolve(result[0]);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
 };
 
 module.exports = Doctor;

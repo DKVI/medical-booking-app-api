@@ -19,6 +19,8 @@ const authenRouter = require("./routers/authen.router");
 const facilityRouter = require("./routers/facility.router");
 const doctorRouter = require("./routers/doctor.router");
 const workScheduleRouter = require("./routers/workschedule.router");
+const schedulingDetailRouter = require("./routers/schedulingdetail.router");
+const patientRouter = require("./routers/patient.router");
 app.use("/api/v1/specialty", specialRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/mail", mailRouter);
@@ -26,6 +28,11 @@ app.use("/api/v1/authen", authenRouter);
 app.use("/api/v1/facility", facilityRouter);
 app.use("/api/v1/doctor", doctorRouter);
 app.use("/api/v1/workschedule", workScheduleRouter);
+app.use("/api/v1/schedulingDetail", schedulingDetailRouter);
+app.use("/api/v1/patient", patientRouter);
+app.get("/complete_order", (req, res) => {
+  res.status(200).json({ message: "Order successfully!" });
+});
 app.get("/return_order", () => {
   console.log("Order returned successfully.");
 });

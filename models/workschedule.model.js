@@ -12,6 +12,17 @@ const Workschedule = {
       }
     });
   },
+  getById: async (id) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const sql = "Select * from workschedule where id = ?";
+        const [result] = await conn.query(sql, [id]);
+        resolve(result);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
 };
 
 module.exports = Workschedule;

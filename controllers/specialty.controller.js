@@ -4,7 +4,7 @@ const SpecialtyController = {
   getAllSpecialties: async (req, res) => {
     try {
       const specialties = await Specialty.getAll();
-      res.status(200).json(specialties);
+      res.status(200).json({ success: true, specialties });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -16,7 +16,7 @@ const SpecialtyController = {
       if (specialty.length === 0) {
         return res.status(404).json({ message: "Specialty not found" });
       }
-      res.status(200).json(specialty[0]);
+      res.status(200).json({ success: true, specialty: specialty[0] });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
