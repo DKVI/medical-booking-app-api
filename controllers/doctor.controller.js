@@ -4,8 +4,13 @@ const doctorController = {
   // Lấy danh sách tất cả các bác sĩ
   getAll: async (req, res) => {
     try {
-      const result = await Doctor.getAll();
-      res.status(200).json(result);
+      var result = null;
+      if (req.query.specialtyId) {
+        result = await Doctor.getBySpecialtyId(req.query.specialtyId);
+      } else {
+        result = await Doctor.getAll(req.query?.keyword);
+      }
+      res.status(200).json({ success: true, doctors: result });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }

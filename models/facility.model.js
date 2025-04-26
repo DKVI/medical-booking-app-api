@@ -76,6 +76,27 @@ const Facility = {
       throw error;
     }
   },
+  getByDoctorId: async (doctorId) => {
+    try {
+      const sql = `
+      SELECT f.* 
+      FROM facility AS f
+      INNER JOIN doctor AS d ON f.id = d.facility_id
+      WHERE d.id = ?
+    `;
+      const [rows] = await conn.query(sql, [doctorId]);
+      if (rows.length === 0) {
+        return {
+          success: false,
+          message: "Facility not found for the given doctor",
+        };
+      }
+      return { success: true, facility: rows[0] };
+    } catch (error) {
+      console.error("Error fetching facility by doctor ID:", error.message);
+      throw error;
+    }
+  },
 };
 
 module.exports = Facility;

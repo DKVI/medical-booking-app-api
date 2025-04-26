@@ -15,7 +15,13 @@ const facilityController = {
   // Lấy danh sách tất cả các facility
   getAll: async (req, res) => {
     try {
-      const result = await Facility.getAll();
+      var result = null;
+
+      if (req.query.doctorId) {
+        result = await Facility.getByDoctorId(req.query.doctorId);
+      } else {
+        result = await Facility.getAll();
+      }
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });

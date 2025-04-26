@@ -13,18 +13,19 @@ const transporter = nodemailer.createTransport({
 const mailController = {
   sendEmail: async (req, res) => {
     try {
-      const { to, subject, body } = req.body;
+      const { to, subject, body, html } = req.body; // Nhận thêm thuộc tính `html` từ request body
       const info = await transporter.sendMail({
         from: process.env.MAIL_USER,
         to: to,
         subject: subject,
-        text: body,
+        text: body, // Nội dung dạng text
+        html: html, // Nội dung dạng HTML
       });
       res.status(200).json({ message: "Email sent successfully" });
-      console.log(info.message);
+      console.log(info.messageId); // Log ID của email đã gửi
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Error sending email" });
+      res.status(500).json({ message: error.message });
     }
   },
 };

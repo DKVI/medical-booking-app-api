@@ -21,6 +21,7 @@ const doctorRouter = require("./routers/doctor.router");
 const workScheduleRouter = require("./routers/workschedule.router");
 const schedulingDetailRouter = require("./routers/schedulingdetail.router");
 const patientRouter = require("./routers/patient.router");
+const purchaseRouter = require("./routers/purchase.router");
 app.use("/api/v1/specialty", specialRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/mail", mailRouter);
@@ -30,6 +31,7 @@ app.use("/api/v1/doctor", doctorRouter);
 app.use("/api/v1/workschedule", workScheduleRouter);
 app.use("/api/v1/schedulingDetail", schedulingDetailRouter);
 app.use("/api/v1/patient", patientRouter);
+app.use("/api/v1/purchase", purchaseRouter)
 app.get("/complete_order", (req, res) => {
   res.status(200).json({ message: "Order successfully!" });
 });

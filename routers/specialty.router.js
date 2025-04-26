@@ -5,7 +5,6 @@ const router = express.Router();
 router.get("/", SpecialtyController.getAllSpecialties);
 
 router.get("/:id", SpecialtyController.getSpecialtyById);
-
 router.post("/", SpecialtyController.createSpecialty);
 
 router.put("/:id", SpecialtyController.updateSpecialty);

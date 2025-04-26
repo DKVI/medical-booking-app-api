@@ -1,12 +1,32 @@
 const conn = require("../db");
 
 const Doctor = {
-  getAll: async () => {
+  getAll: async (keyword) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const sql =
-          "SELECT * FROM user INNER JOIN doctor ON user.id = doctor.user_id";
-        const [result] = await conn.query(sql);
+        let sql;
+        let params = [];
+
+        if (keyword) {
+          // Nếu có keyword, tìm kiếm theo keyword
+          sql = `
+          SELECT * 
+          FROM user 
+          INNER JOIN doctor ON user.id = doctor.user_id
+          WHERE user.fullname LIKE ?
+        `;
+          const searchKeyword = `%${keyword}%`;
+          params = [searchKeyword, searchKeyword, searchKeyword];
+        } else {
+          // Nếu không có keyword, lấy tất cả bác sĩ
+          sql = `
+          SELECT * 
+          FROM user 
+          INNER JOIN doctor ON user.id = doctor.user_id
+        `;
+        }
+
+        const [result] = await conn.query(sql, params);
         resolve(result);
       } catch (err) {
         reject(err);
@@ -33,6 +53,26 @@ const Doctor = {
           "SELECT *, dt.id AS `doctorId`  FROM user INNER JOIN doctor AS dt ON user.id = dt.user_id WHERE dt.id = ?";
         const [result] = await conn.query(sql, [id]);
         resolve(result[0]);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+  getBySpecialtyId: (specialtyId) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const sql = `
+        SELECT 
+          u.*, 
+          d.id AS doctorId, 
+          d.specialty_id, 
+          d.facility_id 
+        FROM user AS u
+        INNER JOIN doctor AS d ON u.id = d.user_id
+        WHERE d.specialty_id = ?
+      `;
+        const [results] = await conn.query(sql, [specialtyId]);
+        resolve(results);
       } catch (err) {
         reject(err);
       }

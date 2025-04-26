@@ -56,6 +56,7 @@ const Specialty = {
       }
     });
   },
+ 
 };
 
 module.exports = Specialty;
