@@ -1,6 +1,24 @@
 const PurchaseModel = require("../models/purchase.model");
 
 const purchaseController = {
+  getAll: async (req, res) => {
+    try {
+      const result = await PurchaseModel.getAll();
+      console.log(result);
+      if (result.length !== 0) {
+        return res.status(200).json({ success: true, purchases: result });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "not found any items" });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err,
+      });
+    }
+  },
   confirmPurchase: async (req, res) => {
     try {
       const result = await PurchaseModel.confirmPurchase(

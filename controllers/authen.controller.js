@@ -82,6 +82,35 @@ const userController = {
       res.status(500).json({ success: false, message: err.message });
     }
   },
+  changePassword: async (req, res) => {
+    try {
+      const { username, password, new_password } = req.body; // Lấy dữ liệu từ request body
+
+      if (!username || !password || !new_password) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Missing required fields" });
+      }
+
+      const result = await User.changePassword(
+        username,
+        password,
+        new_password
+      ); // Gọi model method
+
+      if (!result.success) {
+        return res
+          .status(400)
+          .json({ success: false, message: result.message });
+      }
+
+      res
+        .status(200)
+        .json({ success: true, message: "Password changed successfully" });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  },
 };
 
 module.exports = userController;

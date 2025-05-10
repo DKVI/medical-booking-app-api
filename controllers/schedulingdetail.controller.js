@@ -32,7 +32,27 @@ const SchedulingDetailController = {
     } catch (err) {
       return res.status(500).json({
         success: false,
-        message: error,
+        message: err,
+      });
+    }
+  },
+
+  getAll: async (req, res) => {
+    try {
+      const result = await SchedulingDetail.getAll();
+      if (result.length !== 0) {
+        return res
+          .status(200)
+          .json({ success: true, schedulingDetails: result });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "Not found any data" });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err,
       });
     }
   },

@@ -22,6 +22,8 @@ const PatientModel = {
       throw err;
     }
   },
+
+  
 };
 
 module.exports = PatientModel;

@@ -20,6 +20,15 @@ const PurchaseModel = {
       throw err;
     }
   },
+  getAll: async () => {
+    try {
+      const sql = "SELECT * FROM purchase";
+      const [result] = await conn.query(sql);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
 module.exports = PurchaseModel;

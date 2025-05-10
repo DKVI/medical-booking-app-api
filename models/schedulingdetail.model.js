@@ -39,6 +39,34 @@ const SchedulingDetail = {
       throw err;
     }
   },
+
+  getAll: async () => {
+    try {
+      const sql = `SELECT 
+        sd.id,
+        sd.date,
+        ws.times,
+        u.fullname AS doctor_name,
+        f.name AS facility_name,
+        sd.doctor_id, 
+        sp.name AS "specialty_name",
+		  d.facility_id,
+      sd.status,
+		  sp.id AS "specialty_id"
+      FROM scheduling_detail AS sd
+      INNER JOIN workschedule AS ws ON sd.workschedule_id = ws.id
+      INNER JOIN doctor AS d ON sd.doctor_id = d.id
+      INNER JOIN user AS u ON d.user_id = u.id
+      INNER JOIN facility AS f ON d.facility_id = f.id
+      INNER JOIN specialty AS sp ON sp.id = d.specialty_id
+      
+      `;
+      const [result] = await conn.query(sql);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
 };
 
 module.exports = SchedulingDetail;

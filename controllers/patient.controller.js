@@ -1,5 +1,5 @@
 const PatientModel = require("../models/patient.model");
-
+const UserModel = require("../models/user.model");
 const patientController = {
   // Lấy danh sách tất cả bệnh nhân
   getAll: async (req, res) => {
@@ -24,6 +24,45 @@ const patientController = {
       res.status(200).json({ success: true, patient: result[0] });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  update: async (req, res) => {
+    try {
+      const patientData = req.body; // Lấy dữ liệu cập nhật từ body request
+
+      const result = await UserModel.updatePatientInfo(patientData); // Gọi model để cập nhật thông tin bệnh nhân
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Patient not found or no changes made",
+        });
+      }
+
+      res
+        .status(200)
+        .json({ success: true, message: "Patient updated successfully" });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  changeAvt: async (req, res) => {
+    try {
+      const { id, avatar } = req.body;
+      const result = await UserModel.changeAvatar(id, avatar);
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Doesn't have any user",
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: "Update avatar successfully",
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
     }
   },
 };
