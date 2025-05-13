@@ -9,4 +9,5 @@ router.post("/login", authenController.login);
 router.get("/verify/:token", authenController.verify);
 router.get("/getbytoken", authenController.getByToken);
 router.post("/change-password", authenController.changePassword);
+router.post("/doctor/login", authenController.loginDoctor);
 module.exports = router;

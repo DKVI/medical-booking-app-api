@@ -12,6 +12,15 @@ const Rate = {
       throw err;
     }
   },
+  getBySchedulingId: async (id) => {
+    try {
+      const sql = "SELECT * from rate WHERE scheduling_id = ?";
+      const [result] = await conn.query(sql, [id]);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
   getAverRateByDoctorId: async (id) => {
     try {
       const sql =
@@ -32,6 +41,33 @@ const Rate = {
       `;
       const [result] = await conn.query(sql);
       return result;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  },
+  create: async ({
+    doctor_id,
+    patient_id,
+    star_no,
+    comments,
+    date,
+    scheduling_id,
+  }) => {
+    try {
+      const sql = `
+        INSERT INTO rate (doctor_id, patient_id, star_no, comments, date, scheduling_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      const [result] = await conn.query(sql, [
+        doctor_id,
+        patient_id,
+        star_no,
+        comments,
+        date,
+        scheduling_id,
+      ]);
+      return result.insertId; // Trả về ID của bản ghi vừa được tạo
     } catch (err) {
       console.log(err);
       throw err;

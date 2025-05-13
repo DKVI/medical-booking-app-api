@@ -42,6 +42,19 @@ const userController = {
       res.status(500).json({ message: err.message });
     }
   },
+  loginDoctor: async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const result = await User.loginDoctor(username, password);
+      if (!result.success) {
+        res.status(401).json({ message: result.message });
+      } else {
+        res.status(200).json(result);
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
   verify: async (req, res) => {
     try {
       const token = req.params.token;

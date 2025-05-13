@@ -82,6 +82,12 @@ const User = {
       }
 
       const user = rows[0];
+      if (user.role !== "patient") {
+        return {
+          success: false,
+          message: "Account not available!",
+        };
+      }
       // Kiểm tra trạng thái tài khoản trước
       if (user.status !== "Actived") {
         console.log(false);
@@ -224,6 +230,49 @@ const User = {
       return { success: true, message: "Avatar updated successfully" };
     } catch (error) {
       console.error("Error updating avatar:", error.message);
+      throw error;
+    }
+  },
+  loginDoctor: async (username, password) => {
+    try {
+      const selectSql = "SELECT * FROM user WHERE username = ?";
+      const [rows] = await conn.query(selectSql, [username]);
+
+      if (rows.length === 0) {
+        return { success: false, message: "Invalid username or password" };
+      }
+
+      const user = rows[0];
+
+      // Kiểm tra vai trò của user
+      if (user.role !== "doctor") {
+        return {
+          success: false,
+          message: "Access denied: Not a doctor account",
+        };
+      }
+
+      // Kiểm tra trạng thái tài khoản
+      if (user.status !== "Actived") {
+        return { success: false, message: "Account is not activated" };
+      }
+
+      // Kiểm tra mật khẩu
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return { success: false, message: "Invalid username or password" };
+      }
+
+      // Tạo token
+      const token = jwt.sign(
+        { id: user.id, username: user.username, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
+      );
+
+      return { success: true, token, message: "Login successfully!" };
+    } catch (error) {
+      console.error("Error during doctor login:", error.message);
       throw error;
     }
   },

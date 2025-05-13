@@ -10,5 +10,4 @@ router.get("/:id", doctorController.getById);
 router.post("/", doctorController.create);
 router.put("/:id", doctorController.update);
 router.delete("/:id", doctorController.delete);
-
 module.exports = router;
