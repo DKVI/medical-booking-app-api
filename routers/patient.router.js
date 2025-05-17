@@ -6,4 +6,6 @@ router.get("/", patientController.getAll);
 router.get("/:id", patientController.getById);
 router.post("/", patientController.update);
 router.post("/changeAvt", patientController.changeAvt);
+router.post("/upload-avatar", patientController.uploadAvatar); // Thêm dòng này
+
 module.exports = router;

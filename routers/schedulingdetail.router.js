@@ -5,4 +5,5 @@ const SchedulingDetailController = require("../controllers/schedulingdetail.cont
 router.post("/", SchedulingDetailController.create);
 router.get("/", SchedulingDetailController.getAll);
 router.get("/:id", SchedulingDetailController.getById);
+router.get("/patient/:id", SchedulingDetailController.getByPatientId);
 module.exports = router;

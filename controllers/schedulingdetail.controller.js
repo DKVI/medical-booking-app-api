@@ -56,6 +56,26 @@ const SchedulingDetailController = {
       });
     }
   },
+  getByPatientId: async (req, res) => {
+    try {
+      console.log(req.params.id);
+      const result = await SchedulingDetail.getByPatientId(req.params.id);
+      if (result.length !== 0) {
+        return res
+          .status(200)
+          .json({ success: true, schedulingDetails: result });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "Not found any data" });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err,
+      });
+    }
+  },
 };
 
 module.exports = SchedulingDetailController;

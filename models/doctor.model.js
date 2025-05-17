@@ -78,6 +78,64 @@ const Doctor = {
       }
     });
   },
+  getDoctorByUsername: async (username) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const sql = `
+        SELECT 
+          u.fullname, 
+          u.email, 
+          u.phone_no, 
+          u.username, 
+          u.gender, 
+          u.avatar, 
+          u.identity_no, 
+          u.id AS user_id, 
+          dt.id AS doctor_id, 
+          f.name AS facility_name, 
+          s.name AS specialty_name
+        FROM user AS u 
+        INNER JOIN doctor AS dt ON u.id = dt.user_id 
+        INNER JOIN facility AS f ON dt.facility_id = f.id 
+        INNER JOIN specialty AS s ON dt.specialty_id = s.id
+        WHERE u.username = ?
+      `;
+        const [result] = await conn.query(sql, [username]);
+        resolve(result[0]);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+  getTotalPatients: async (id) => {
+    try {
+      const sql = `SELECT COUNT(*) as total_patients 
+                    FROM scheduling_detail as sd 
+                      WHERE doctor_id = ? AND sd.status = "Done"`;
+      const [result] = await conn.query(sql, [id]);
+      return result[0];
+    } catch (err) {
+      throw err;
+    }
+  },
+  getTotalAppointmentToday: async (id) => {
+    try {
+      const sql = `SELECT COUNT(*) AS total_appointments_today
+                    FROM scheduling_detail AS sd
+                      INNER JOIN purchase AS p ON p.scheduling_details_id = sd.id
+                        WHERE sd.doctor_id = ? AND sd.date = CURDATE();`;
+      const [result] = await conn.query(sql, [id]);
+      return result[0];
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  // getTotalAppointment: async (id) => {
+  //   try {
+  //     const sql = ``
+  //   }
+  // }
 };
 
 module.exports = Doctor;

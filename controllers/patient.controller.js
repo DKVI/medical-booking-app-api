@@ -1,5 +1,6 @@
 const PatientModel = require("../models/patient.model");
 const UserModel = require("../models/user.model");
+const uploadAvatar = require("./upload.controller");
 const patientController = {
   // Lấy danh sách tất cả bệnh nhân
   getAll: async (req, res) => {
@@ -65,6 +66,8 @@ const patientController = {
       res.status(500).json({ success: false, message: err.message });
     }
   },
+
+  uploadAvatar: uploadAvatar,
 };
 
 module.exports = patientController;

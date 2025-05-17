@@ -86,6 +86,35 @@ const doctorController = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  getTotalPatients: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = await Doctor.getTotalPatients(id);
+      const totalPatients = result.total_patients;
+      return res
+        .status(200)
+        .json({ success: true, total_patients: totalPatients });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err });
+    }
+  },
+  getTotalAppointmentToday: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = await Doctor.getTotalAppointmentToday(id);
+      const totalAppointmentToday = result.total_appointments_today;
+      return res.status(200).json({
+        success: true,
+        total_appointments_today: totalAppointmentToday,
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err });
+    }
+  },
+  getTotalAppointment: async (req, res) => {
+    try {
+    } catch (err) {}
+  },
 };
 
 module.exports = doctorController;

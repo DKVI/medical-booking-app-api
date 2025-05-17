@@ -8,15 +8,15 @@ const User = {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const sql =
-        "INSERT INTO user (username, password, email, status, role) VALUES (?, ?, ?, ?, ?)";
+        "INSERT INTO user (username, password, email, status, role, avatar) VALUES (?, ?, ?, ?, ?, ?)";
       const [result] = await conn.query(sql, [
         username,
         hashedPassword,
         email,
         "Pending",
         "patient",
+        "https://avatar.iran.liara.run/public/1",
       ]);
-
       const token = jwt.sign(
         { id: result.insertId, username },
         process.env.JWT_SECRET,
@@ -47,8 +47,9 @@ const User = {
       if (rows.length === 0) {
         return { success: false, message: "User not found" };
       }
-
       const user = rows[0];
+      const secondSql = "INSERT INTO patient (user_id) VALUES (?)";
+      const [secondRows] = await conn.query(secondSql, [user.id]);
 
       // Kiểm tra trạng thái tài khoản
       if (user.status === "Actived") {
@@ -121,7 +122,7 @@ const User = {
       }
 
       const selectSql =
-        "SELECT *,u.id AS user_id,pt.id AS patient_id FROM user AS u JOIN patient AS pt WHERE username = ?";
+        "SELECT *,u.id AS user_id,pt.id AS patient_id FROM user AS u JOIN patient AS pt ON u.id = pt.user_id WHERE username = ?";
       const [rows] = await conn.query(selectSql, [decoded.username]);
 
       if (rows.length === 0) {
@@ -147,60 +148,111 @@ const User = {
     }
   },
   updatePatientInfo: async (userInfo) => {
+    let fullname,
+      gender,
+      gmail,
+      idNumber,
+      insuranceNumber,
+      phoneNumber,
+      username;
+    let userRows, userId, updateUserResult, updatePatientResult;
     try {
-      const {
-        fullname,
-        gender,
-        gmail,
-        idNumber,
-        insuranceNumber,
-        phoneNumber,
-        username,
-      } = userInfo;
+      // Lấy thông tin từ userInfo  
+      fullname = userInfo.fullname;
+      gender = userInfo.gender;
+      gmail = userInfo.gmail;
+      idNumber = userInfo.idNumber;  
+      insuranceNumber = userInfo.insuranceNumber;
+      phoneNumber = userInfo.phoneNumber;
+      username = userInfo.username;
 
       // Bắt đầu transaction
-      await conn.query("START TRANSACTION");
+      try {
+        await conn.query("START TRANSACTION");
+      } catch (error) {
+        console.error("Error starting transaction:", error.message);
+        throw error;
+      }
 
       // Lấy user_id tương ứng với username
-      const getUserIdSql = "SELECT id FROM user WHERE username = ?";
-      const [userRows] = await conn.query(getUserIdSql, [username]);
+      try {
+        const getUserIdSql = "SELECT id FROM user WHERE username = ?";
+        [userRows] = await conn.query(getUserIdSql, [username]);
+      } catch (error) {
+        console.error("Error getting user id:", error.message);
+        throw error;
+      }
 
-      if (userRows.length === 0) {
+      if (!userRows || userRows.length === 0) {
+        // Rollback nếu không tìm thấy user
+        try {
+          await conn.query("ROLLBACK");
+        } catch (rollbackError) {
+          console.error("Error during rollback:", rollbackError.message);
+        }
         throw new Error("User not found");
       }
 
-      const userId = userRows[0].id;
+      userId = userRows[0].id;
 
       // Cập nhật bảng user
-      const updateUserSql = `
-        UPDATE user
-        SET 
-          fullname = ?,
-          gender = ?,
-          email = ?,
-          identity_no = ?,
-          phone_no = ?
-        WHERE id = ?
-      `;
-      await conn.query(updateUserSql, [
-        fullname,
-        gender,
-        gmail,
-        idNumber,
-        phoneNumber,
-        userId,
-      ]);
+      try {
+        const updateUserSql = `
+          UPDATE user
+          SET 
+            fullname = ?,
+            gender = ?,
+            email = ?,
+            identity_no = ?,
+            phone_no = ?
+          WHERE id = ?
+        `;
+        [updateUserResult] = await conn.query(updateUserSql, [
+          fullname,
+          gender,
+          gmail,
+          idNumber,
+          phoneNumber,
+          userId,
+        ]);
+      } catch (error) {
+        console.error("Error updating user table:", error.message);
+        try {
+          await conn.query("ROLLBACK");
+        } catch (rollbackError) {
+          console.error("Error during rollback:", rollbackError.message);
+        }
+        throw error;
+      }
 
       // Cập nhật bảng patient
-      const updatePatientSql = `
-        UPDATE patient
-        SET insurance_no = ?
-        WHERE user_id = ?
-      `;
-      await conn.query(updatePatientSql, [insuranceNumber, userId]);
+      try {
+        const updatePatientSql = `
+          UPDATE patient
+          SET insurance_no = ?
+          WHERE user_id = ?
+        `;
+        [updatePatientResult] = await conn.query(updatePatientSql, [
+          insuranceNumber,
+          userId,
+        ]);
+      } catch (error) {
+        console.error("Error updating patient table:", error.message);
+        try {
+          await conn.query("ROLLBACK");
+        } catch (rollbackError) {
+          console.error("Error during rollback:", rollbackError.message);
+        }
+        throw error;
+      }
 
       // Commit transaction
-      await conn.query("COMMIT");
+      try {
+        await conn.query("COMMIT");
+      } catch (error) {
+        console.error("Error during commit:", error.message);
+        throw error;
+      }
 
       return {
         success: true,
@@ -208,7 +260,11 @@ const User = {
       };
     } catch (error) {
       // Rollback transaction nếu có lỗi
-      await conn.query("ROLLBACK");
+      try {
+        await conn.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error("Error during rollback:", rollbackError.message);
+      }
       console.error("Error updating patient info:", error.message);
       throw error;
     }

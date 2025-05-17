@@ -1,4 +1,6 @@
+const Doctor = require("../models/doctor.model");
 const User = require("../models/user.model");
+const doctorController = require("./doctor.controller");
 
 const userController = {
   createAccount: async (req, res) => {
@@ -120,6 +122,39 @@ const userController = {
       res
         .status(200)
         .json({ success: true, message: "Password changed successfully" });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  },
+  getDoctorByToken: async (req, res) => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Token is missing" });
+      }
+
+      // Giải mã token để lấy username
+      const jwt = require("jsonwebtoken");
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const username = decoded.username;
+
+      if (!username) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid token" });
+      }
+
+      const doctor = await Doctor.getDoctorByUsername(username);
+
+      if (!doctor) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Doctor not found" });
+      }
+
+      res.status(200).json({ success: true, doctor });
     } catch (err) {
       res.status(500).json({ success: false, message: err.message });
     }

@@ -36,6 +36,8 @@ app.use("/api/v1/patient", patientRouter);
 app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/prescription", prescriptionRouter);
 app.use("/api/v1/rate", rateRouter);
+
+app.use("/public", express.static("public"));
 app.get("/complete_order", (req, res) => {
   res.status(200).json({ message: "Order successfully!" });
 });
