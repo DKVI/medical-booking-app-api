@@ -154,17 +154,21 @@ const User = {
       idNumber,
       insuranceNumber,
       phoneNumber,
-      username;
+      username,
+      height,
+      weight;
     let userRows, userId, updateUserResult, updatePatientResult;
     try {
-      // Lấy thông tin từ userInfo  
+      // Lấy thông tin từ userInfo
       fullname = userInfo.fullname;
       gender = userInfo.gender;
       gmail = userInfo.gmail;
-      idNumber = userInfo.idNumber;  
+      idNumber = userInfo.idNumber;
       insuranceNumber = userInfo.insuranceNumber;
       phoneNumber = userInfo.phoneNumber;
       username = userInfo.username;
+      weight = userInfo.weight;
+      height = userInfo.height;
 
       // Bắt đầu transaction
       try {
@@ -229,11 +233,13 @@ const User = {
       try {
         const updatePatientSql = `
           UPDATE patient
-          SET insurance_no = ?
+          SET insurance_no = ?, weight = ?, height = ?
           WHERE user_id = ?
         `;
         [updatePatientResult] = await conn.query(updatePatientSql, [
           insuranceNumber,
+          weight,
+          height,
           userId,
         ]);
       } catch (error) {

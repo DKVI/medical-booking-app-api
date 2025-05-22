@@ -44,7 +44,7 @@ const uploadAvatar = [
         .toFile(outputPath);
 
       // Trả về đường dẫn ảnh đã crop
-      const avatarUrl = `http://localhost:3000/public/avatars/cropped_${req.file.filename}`;
+      const avatarUrl = `/public/avatars/cropped_${req.file.filename}`;
       res.status(200).json({ success: true, avatarUrl });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });

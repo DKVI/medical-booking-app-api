@@ -131,11 +131,62 @@ const Doctor = {
     }
   },
 
-  // getTotalAppointment: async (id) => {
-  //   try {
-  //     const sql = ``
-  //   }
-  // }
+  getTotalAppointment: async (id) => {
+    try {
+      const sql = `SELECT COUNT(*) AS total_appointments
+                    FROM scheduling_detail AS sd
+                      INNER JOIN purchase AS p ON p.scheduling_details_id = sd.id
+                        WHERE sd.doctor_id = ? AND p.status = 'Purchased';`;
+
+      const [result] = await conn.query(sql, [id]);
+      return result[0];
+    } catch (err) {
+      throw err;
+    }
+  },
+  getAppointmentToday: async (id) => {
+    try {
+      const sql = `SELECT sd.id, u.dob, p.weight, p.height, ws.times, u.email, u.fullname, u.username, u.phone_no, u.gender, u.avatar, sd.date, pc.status AS pucharse_status, sd.status AS scheduling_status
+                    FROM scheduling_detail AS sd INNER JOIN purchase AS pc 
+                      ON sd.id = pc.scheduling_details_id INNER JOIN patient AS p ON sd.patient_id = p.id
+                        INNER JOIN user AS u ON u.id = p.user_id
+                          INNER JOIN workschedule AS ws ON ws.id = sd.workschedule_id
+                            WHERE sd.status = "Process" AND pc.status = "Purchased" AND sd.date = CURDATE() AND sd.doctor_id = ?`;
+      const [result] = await conn.query(sql, [id]);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
+  getAllAppointment: async (id) => {
+    try {
+      const sql = `SELECT sd.id, u.dob, p.weight, p.height, ws.times, u.email, u.fullname, u.username, u.phone_no, u.gender, u.avatar, sd.date, pc.status AS pucharse_status, sd.status AS scheduling_status
+                    FROM scheduling_detail AS sd INNER JOIN purchase AS pc 
+                      ON sd.id = pc.scheduling_details_id INNER JOIN patient AS p ON sd.patient_id = p.id
+                        INNER JOIN user AS u ON u.id = p.user_id
+                          INNER JOIN workschedule AS ws ON ws.id = sd.workschedule_id
+                            WHERE pc.status = "Purchased" AND sd.doctor_id = ?`;
+      const [result] = await conn.query(sql, [id]);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
+  getAppointmentById: async (id) => {
+    try {
+      const sql = `SELECT sd.id, u.dob, p.weight, p.height, ws.times, u.email, u.fullname, u.username, u.phone_no, u.gender, u.avatar, sd.date, pc.status AS pucharse_status, sd.status AS scheduling_status
+                    FROM scheduling_detail AS sd INNER JOIN purchase AS pc 
+                      ON sd.id = pc.scheduling_details_id INNER JOIN patient AS p ON sd.patient_id = p.id
+                        INNER JOIN user AS u ON u.id = p.user_id
+                          INNER JOIN workschedule AS ws ON ws.id = sd.workschedule_id
+                            WHERE pc.status = "Purchased" AND sd.id = ?`;
+      const [result] = await conn.query(sql, [id]);
+      return result[0];
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  },
 };
 
 module.exports = Doctor;

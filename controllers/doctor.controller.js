@@ -113,7 +113,52 @@ const doctorController = {
   },
   getTotalAppointment: async (req, res) => {
     try {
-    } catch (err) {}
+      const { id } = req.params;
+      const result = await Doctor.getTotalAppointment(id);
+      const totalAppointments = result.total_appointments;
+      return res.status(200).json({
+        success: true,
+        total_appointments: totalAppointments,
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err });
+    }
+  },
+  getAppointmentToday: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = await Doctor.getAppointmentToday(id);
+      return res.status(200).json({
+        success: true,
+        appointments: result,
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err });
+    }
+  },
+  getAllAppointment: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = await Doctor.getAllAppointment(id);
+      return res.status(200).json({
+        success: true,
+        appointments: result,
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err });
+    }
+  },
+  getAppointmentById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = await Doctor.getAppointmentById(id);
+      return res.status(200).json({
+        success: true,
+        appointment: result,
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err });
+    }
   },
 };
 
