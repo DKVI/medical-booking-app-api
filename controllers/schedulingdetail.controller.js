@@ -76,6 +76,20 @@ const SchedulingDetailController = {
       });
     }
   },
+  checkExpired: async (req, res) => {
+    try {
+      const result = await SchedulingDetail.checkExpired(
+        req.params.id,
+        req.body
+      );
+      return res.status(200).json({ success: true, status: result });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err,
+      });
+    }
+  },
 };
 
 module.exports = SchedulingDetailController;

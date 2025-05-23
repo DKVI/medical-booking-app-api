@@ -1,5 +1,5 @@
 const Doctor = require("../models/doctor.model");
-
+const UserModel = require("../models/user.model");
 const doctorController = {
   // Lấy danh sách tất cả các bác sĩ
   getAll: async (req, res) => {
@@ -59,19 +59,6 @@ const doctorController = {
   },
 
   // Cập nhật thông tin của một bác sĩ
-  update: async (req, res) => {
-    try {
-      const { id } = req.params; // Lấy ID từ URL params
-      const { specialty, facilityId } = req.body; // Lấy thông tin từ body request
-      const result = await Doctor.update(id, specialty, facilityId);
-      if (!result.success) {
-        return res.status(404).json(result);
-      }
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
-    }
-  },
 
   // Xóa một bác sĩ theo ID
   delete: async (req, res) => {
@@ -158,6 +145,46 @@ const doctorController = {
       });
     } catch (err) {
       return res.status(500).json({ success: false, message: err });
+    }
+  },
+  updateDoctorInfo: async (req, res) => {
+    try {
+      const { id } = req.params; // id là doctorId
+      const updateData = req.body; // các trường cần update: fullname, dob, email, identity_no, phone_no, gender, avatar
+
+      const result = await Doctor.updateDoctorInfo(id, updateData);
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Doctor not found or no changes made",
+        });
+      }
+
+      res
+        .status(200)
+        .json({ success: true, message: "Doctor info updated successfully" });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  changeAvatar: async (req, res) => {
+    try {
+      const { id, avatar } = req.body;
+      const result = await UserModel.changeAvatar(id, avatar);
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Doesn't have any user",
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: "Update avatar successfully",
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
     }
   },
 };

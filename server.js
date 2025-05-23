@@ -25,6 +25,7 @@ const purchaseRouter = require("./routers/purchase.router");
 const prescriptionRouter = require("./routers/prescription.router");
 const rateRouter = require("./routers/rate.router");
 const medicineRouter = require("./routers/medicine.router");
+const mediaRouter = require("./routers/media.router");
 app.use("/api/v1/specialty", specialRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/mail", mailRouter);
@@ -38,6 +39,7 @@ app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/prescription", prescriptionRouter);
 app.use("/api/v1/rate", rateRouter);
 app.use("/api/v1/medicine", medicineRouter);
+app.use("/api/v1/media", mediaRouter);
 
 app.use("/public", express.static("public"));
 app.get("/complete_order", (req, res) => {

@@ -1,4 +1,6 @@
 const conn = require("../db");
+const SchedulingDetail = require("./schedulingdetail.model");
+const User = require("./user.model");
 
 const Doctor = {
   getAll: async (keyword) => {
@@ -84,6 +86,7 @@ const Doctor = {
         const sql = `
         SELECT 
           u.fullname, 
+          u.dob,
           u.email, 
           u.phone_no, 
           u.username, 
@@ -161,13 +164,29 @@ const Doctor = {
   getAllAppointment: async (id) => {
     try {
       const sql = `SELECT sd.id, u.dob, p.weight, p.height, ws.times, u.email, u.fullname, u.username, u.phone_no, u.gender, u.avatar, sd.date, pc.status AS pucharse_status, sd.status AS scheduling_status
-                    FROM scheduling_detail AS sd INNER JOIN purchase AS pc 
-                      ON sd.id = pc.scheduling_details_id INNER JOIN patient AS p ON sd.patient_id = p.id
-                        INNER JOIN user AS u ON u.id = p.user_id
-                          INNER JOIN workschedule AS ws ON ws.id = sd.workschedule_id
-                            WHERE pc.status = "Purchased" AND sd.doctor_id = ?`;
+        FROM scheduling_detail AS sd INNER JOIN purchase AS pc 
+          ON sd.id = pc.scheduling_details_id INNER JOIN patient AS p ON sd.patient_id = p.id
+            INNER JOIN user AS u ON u.id = p.user_id
+              INNER JOIN workschedule AS ws ON ws.id = sd.workschedule_id
+                WHERE pc.status = "Purchased" AND sd.doctor_id = ?`;
       const [result] = await conn.query(sql, [id]);
-      return result;
+
+      // Duyệt tuần tự, đảm bảo cập nhật xong hết trước khi lấy lại dữ liệu
+      for (const item of result) {
+        try {
+          await SchedulingDetail.checkExpired(item.id, {
+            date: item.date,
+            times: item.times,
+            status: item.scheduling_status,
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      // Lấy lại dữ liệu đã cập nhật
+      const [result2] = await conn.query(sql, [id]);
+      return result2;
     } catch (err) {
       throw err;
     }
@@ -184,6 +203,34 @@ const Doctor = {
       return result[0];
     } catch (err) {
       console.log(err);
+      throw err;
+    }
+  },
+  updateDoctorInfo: async (id, data) => {
+    try {
+      // Lấy user_id từ bảng doctor
+      const { fullname, dob, email, identity_no, phone_no, gender } = data;
+      const sql = `
+      UPDATE user SET 
+        fullname = ?, 
+        dob = ?, 
+        email = ?, 
+        identity_no = ?, 
+        phone_no = ?, 
+        gender = ?
+      WHERE id = ?
+    `;
+      const [result] = await conn.query(sql, [
+        fullname,
+        dob,
+        email,
+        identity_no,
+        phone_no,
+        gender,
+        id,
+      ]);
+      return result;
+    } catch (err) {
       throw err;
     }
   },
