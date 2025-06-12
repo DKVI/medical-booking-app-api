@@ -15,6 +15,38 @@ const SchedulingDetailController = {
       });
     }
   },
+  markAsDone: async (req, res) => {
+    try {
+      const id = req.params.id;
+      await SchedulingDetail.markAsDone(id);
+      return res.status(200).json({
+        success: true,
+        messsage: `mark as done successfully!`,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: true,
+        messsage: `mark as done failure!`,
+      });
+    }
+  },
+  markAsInprocess: async (req, res) => {
+    try {
+      console.log(req);
+      const id = req.params.id;
+      console.log(id);
+      await SchedulingDetail.markAsInprocess(id);
+      return res.status(200).json({
+        success: true,
+        messsage: `mark as in process successfully!`,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: true,
+        messsage: `mark as in process done failure!`,
+      });
+    }
+  },
   getById: async (req, res) => {
     try {
       const id = req.params.id;

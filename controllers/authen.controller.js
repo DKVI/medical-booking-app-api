@@ -2,7 +2,7 @@ const Doctor = require("../models/doctor.model");
 const User = require("../models/user.model");
 const doctorController = require("./doctor.controller");
 
-const userController = {
+const authenController = {
   createAccount: async (req, res) => {
     try {
       const { username, password, email } = req.body;
@@ -161,4 +161,4 @@ const userController = {
   },
 };
 
-module.exports = userController;
+module.exports = authenController;

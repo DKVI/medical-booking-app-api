@@ -9,6 +9,7 @@ router.get("/filter", doctorController.getByFacilityIdAndSpecialtyId);
 router.get("/:id", doctorController.getById);
 router.post("/", doctorController.create);
 router.put("/:id", doctorController.updateDoctorInfo);
+router.put("/full-update/:id", doctorController.updateDoctorFullInfo);
 router.delete("/:id", doctorController.delete);
 router.get("/total-patients/:id", doctorController.getTotalPatients);
 router.get(

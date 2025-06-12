@@ -168,6 +168,27 @@ const doctorController = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  updateDoctorFullInfo: async (req, res) => {
+    try {
+      const { id } = req.params; // id là doctorId
+      const updateData = req.body; // các trường cần update: fullname, dob, email, identity_no, phone_no, gender, avatar
+
+      const result = await Doctor.updateDoctorFullInfo(id, updateData);
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Doctor not found or no changes made",
+        });
+      }
+
+      res
+        .status(200)
+        .json({ success: true, message: "Doctor info updated successfully" });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
   changeAvatar: async (req, res) => {
     try {
       const { id, avatar } = req.body;

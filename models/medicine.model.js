@@ -6,7 +6,6 @@ const Medicince = {
       console.log("hello");
       const sql = "SELECT * FROM medicine";
       const [result] = await conn.query(sql);
-      console.log(result);
       return result;
     } catch (err) {
       throw err;

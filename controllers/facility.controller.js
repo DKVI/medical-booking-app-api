@@ -4,8 +4,7 @@ const facilityController = {
   // Tạo mới một facility
   create: async (req, res) => {
     try {
-      const { name, address } = req.body;
-      const result = await Facility.create(name, address);
+      const result = await Facility.create(req.body);
       res.status(201).json(result);
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
@@ -46,8 +45,7 @@ const facilityController = {
   update: async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, address } = req.body;
-      const result = await Facility.update(id, name, address);
+      const result = await Facility.update(id, req.body);
       if (!result.success) {
         return res.status(404).json(result);
       }

@@ -3,6 +3,15 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = {
+  getALL: async () => {
+    try {
+      const sql = `SELECT * FROM user`;
+      const [result] = await conn.query(sql);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
   createAccount: async (username, password, email) => {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -122,7 +131,7 @@ const User = {
       }
 
       const selectSql =
-        "SELECT *,u.id AS user_id,pt.id AS patient_id FROM user AS u JOIN patient AS pt ON u.id = pt.user_id WHERE username = ?";
+        "SELECT *,u.id AS user_id, pt.id AS patient_id FROM user AS u JOIN patient AS pt ON u.id = pt.user_id WHERE username = ?";
       const [rows] = await conn.query(selectSql, [decoded.username]);
 
       if (rows.length === 0) {
@@ -156,7 +165,9 @@ const User = {
       phoneNumber,
       username,
       height,
-      weight;
+      weight,
+      address,
+      dob;
     let userRows, userId, updateUserResult, updatePatientResult;
     try {
       // Lấy thông tin từ userInfo
@@ -169,6 +180,8 @@ const User = {
       username = userInfo.username;
       weight = userInfo.weight;
       height = userInfo.height;
+      dob = userInfo.dob;
+      address = userInfo.address;
 
       // Bắt đầu transaction
       try {
@@ -208,7 +221,9 @@ const User = {
             gender = ?,
             email = ?,
             identity_no = ?,
-            phone_no = ?
+            phone_no = ?,
+            address = ?,
+            dob = ?
           WHERE id = ?
         `;
         [updateUserResult] = await conn.query(updateUserSql, [
@@ -217,6 +232,8 @@ const User = {
           gmail,
           idNumber,
           phoneNumber,
+          address,
+          dob,
           userId,
         ]);
       } catch (error) {
@@ -373,6 +390,51 @@ const User = {
       return { success: true, message: "Password updated successfully" };
     } catch (error) {
       console.error("Error changing password:", error.message);
+      throw error;
+    }
+  },
+  create: async ({
+    username,
+    password,
+    fullname = null,
+    identity_no = null,
+    phone_no = null,
+    email = null,
+    role,
+    status = "Pending",
+    gender = null,
+    avatar = "https://avatar.iran.liara.run/public/1",
+    dob = null,
+    address = null,
+  }) => {
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const sql = `
+        INSERT INTO user (
+          username, password, fullname, identity_no, phone_no, email, role, status, gender, avatar, dob, address
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const [result] = await conn.query(sql, [
+        username,
+        hashedPassword,
+        fullname,
+        identity_no,
+        phone_no,
+        email,
+        role,
+        status,
+        gender,
+        avatar,
+        dob,
+        address,
+      ]);
+      return {
+        success: true,
+        userId: result.insertId,
+        message: "User created successfully",
+      };
+    } catch (error) {
+      console.error("Error creating user:", error.message);
       throw error;
     }
   },

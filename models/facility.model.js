@@ -2,10 +2,12 @@ const conn = require("../db");
 
 const Facility = {
   // Tạo mới một facility
-  create: async (name, address) => {
+  create: async (data) => {
     try {
-      const sql = "INSERT INTO facility (name, address) VALUES (?, ?)";
-      const [result] = await conn.query(sql, [name, address]);
+      const { name, address, phone } = data;
+      const sql =
+        "INSERT INTO facility (name, address, phone) VALUES (?, ?, ?)";
+      const [result] = await conn.query(sql, [name, address, phone]);
       return {
         success: true,
         id: result.insertId,
@@ -45,10 +47,11 @@ const Facility = {
   },
 
   // Cập nhật thông tin của một facility
-  update: async (id, name, address) => {
+  update: async (id, { name, address, phone }) => {
     try {
-      const sql = "UPDATE facility SET name = ?, address = ? WHERE id = ?";
-      const [result] = await conn.query(sql, [name, address, id]);
+      const sql =
+        "UPDATE facility SET name = ?, address = ?, phone = ? WHERE id = ?";
+      const [result] = await conn.query(sql, [name, address, phone, id]);
       if (result.affectedRows === 0) {
         return {
           success: false,

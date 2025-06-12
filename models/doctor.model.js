@@ -22,9 +22,19 @@ const Doctor = {
         } else {
           // Nếu không có keyword, lấy tất cả bác sĩ
           sql = `
-          SELECT * 
-          FROM user 
-          INNER JOIN doctor ON user.id = doctor.user_id
+          SELECT 
+          u.*, 
+          d.id AS doctorId, 
+          d.specialty_id, 
+          d.facility_id,
+          f.name AS facility,
+          s.name AS specialty,
+          u.gender,
+          u.identity_no
+        FROM user AS u
+        INNER JOIN doctor AS d ON u.id = d.user_id
+        INNER JOIN facility AS f ON f.id = d.facility_id
+        INNER JOIN specialty AS s ON s.id = d.specialty_id
         `;
         }
 
@@ -74,6 +84,24 @@ const Doctor = {
         WHERE d.specialty_id = ?
       `;
         const [results] = await conn.query(sql, [specialtyId]);
+        resolve(results);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+  getByFaciltyId: (facilityId) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const sql = `SELECT 
+          u.*, 
+          d.id AS doctorId, 
+          d.specialty_id, 
+          d.facility_id 
+        FROM user AS u
+        INNER JOIN doctor AS d ON u.id = d.user_id
+        WHERE d.specialty_id = ?`;
+        const [results] = await conn.query(sql, [facilityId]);
         resolve(results);
       } catch (err) {
         reject(err);
@@ -228,6 +256,26 @@ const Doctor = {
         phone_no,
         gender,
         id,
+      ]);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  updateDoctorFullInfo: async (doctorId, data) => {
+    try {
+      await Doctor.updateDoctorInfo(data.id, data);
+      const { facilityId, specialtyId } = data;
+      const sql = `
+        UPDATE doctor
+        SET facility_id = ?, specialty_id = ?
+        WHERE id = ?
+      `;
+      const [result] = await conn.query(sql, [
+        facilityId,
+        specialtyId,
+        doctorId,
       ]);
       return result;
     } catch (err) {

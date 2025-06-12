@@ -7,7 +7,7 @@ app.use(express.json());
 // Configure CORS
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow only this origin
+    origin: ["http://localhost:5173", "http://localhost:5174"], // Allow only this origin
   })
 );
 
@@ -26,6 +26,8 @@ const prescriptionRouter = require("./routers/prescription.router");
 const rateRouter = require("./routers/rate.router");
 const medicineRouter = require("./routers/medicine.router");
 const mediaRouter = require("./routers/media.router");
+const statisticsRouter = require("./routers/statistics.router");
+const userRouter = require("./routers/user.router");
 app.use("/api/v1/specialty", specialRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/mail", mailRouter);
@@ -40,7 +42,8 @@ app.use("/api/v1/prescription", prescriptionRouter);
 app.use("/api/v1/rate", rateRouter);
 app.use("/api/v1/medicine", medicineRouter);
 app.use("/api/v1/media", mediaRouter);
-
+app.use("/api/v1/statistics", statisticsRouter);
+app.use("/api/v1/user", userRouter);
 app.use("/public", express.static("public"));
 app.get("/complete_order", (req, res) => {
   res.status(200).json({ message: "Order successfully!" });

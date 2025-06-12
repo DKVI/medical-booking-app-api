@@ -8,7 +8,6 @@ const SchedulingDetail = {
         INSERT INTO scheduling_detail (id, doctor_id, patient_id, workschedule_id, date, status)
         VALUES (?, ?, ?, ?, ?, ?)
       `;
-      console.log(body);
       const [result] = await conn.query(sql, [
         body.id,
         body.doctor_id,
@@ -39,7 +38,25 @@ const SchedulingDetail = {
       throw err;
     }
   },
-
+  markAsDone: async (id) => {
+    try {
+      const sql = "UPDATE scheduling_detail SET status = 'Done' WHERE id = ?";
+      const [result] = await conn.query(sql, [id]);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
+  markAsInprocess: async (id) => {
+    try {
+      const sql =
+        "UPDATE scheduling_detail SET status = 'Process' WHERE id = ?";
+      const [result] = await conn.query(sql, [id]);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  },
   getAll: async () => {
     try {
       const sql = `SELECT 
@@ -51,14 +68,18 @@ const SchedulingDetail = {
         sd.doctor_id, 
         sp.name AS "specialty_name",
         d.facility_id,
-        sd.status,
-        sp.id AS "specialty_id"
+        sd.status,  
+        f.address,
+        sd.patient_id,
+        sp.id AS "specialty_id",
+        p.status AS "purchase_status"
       FROM scheduling_detail AS sd
       INNER JOIN workschedule AS ws ON sd.workschedule_id = ws.id
       INNER JOIN doctor AS d ON sd.doctor_id = d.id
       INNER JOIN user AS u ON d.user_id = u.id
       INNER JOIN facility AS f ON d.facility_id = f.id
       INNER JOIN specialty AS sp ON sp.id = d.specialty_id
+      INNER JOIN purchase AS p ON p.scheduling_details_id = sd.id
       `;
       const [result] = await conn.query(sql);
 
@@ -90,6 +111,7 @@ const SchedulingDetail = {
         u.fullname AS doctor_name,
         f.name AS facility_name,
         sd.doctor_id, 
+        f.address,
         sp.name AS "specialty_name",
 		  d.facility_id,
       sd.status,
@@ -125,7 +147,6 @@ const SchedulingDetail = {
     const today = new Date().toISOString().split("T")[0]; // Lấy ngày hôm nay (YYYY-MM-DD)
     const date1 = new Date(`${today}T${t1}:00`);
     const date2 = new Date(`${today}T${t2}:00`);
-    console.log({ date1, date2 });
     return date1 > date2;
   },
   checkExpired: async (id, data) => {
@@ -166,20 +187,23 @@ const SchedulingDetail = {
 
       // times dạng "HH:mm - HH:mm"
       const endTime = times.split(" - ")[1]?.trim();
-      console.log({ formatedDate, todayStr });
       // So sánh ngày và giờ
       if (formatedDate < todayStr) {
         if (status !== "Done") {
-          const sql = `UPDATE scheduling_detail SET status = 'Expired' WHERE id = ?`;
-          await conn.query(sql, [id]);
+          const sql1 = `UPDATE scheduling_detail SET status = 'Expired' WHERE id = ?`;
+          const sql2 = `UPDATE purchase SET status = 'Expired' WHERE purchase.scheduling_details_id = ?`;
+          await conn.query(sql1, [id]);
+          await conn.query(sql2, [id]);
         }
         return "Expired";
       } else if (formatedDate === todayStr) {
         // So sánh giờ kết thúc với giờ hiện tại
         if (endTime < currentTime) {
           if (status !== "Done") {
-            const sql = `UPDATE scheduling_detail SET status = 'Expired' WHERE id = ?`;
-            await conn.query(sql, [id]);
+            const sql1 = `UPDATE scheduling_detail SET status = 'Expired' WHERE id = ?`;
+            const sql2 = `UPDATE purchase SET status = 'Expired' WHERE purchase.scheduling_details_id = ?`;
+            await conn.query(sql1, [id]);
+            await conn.query(sql2, [id]);
           }
           return "Expired";
         }
