@@ -46,6 +46,23 @@ const Doctor = {
     });
   },
 
+  update: async (id, data) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const sql =
+          "UPDATE doctor SET facility_id = ?, specialty_id = ? WHERE id = ?";
+        const [result] = await conn.query(sql, [
+          data.facility_id,
+          data.specialty_id,
+          id,
+        ]);
+        resolve(result.affectedRows);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+
   getByFacilityIdAndSpecialtyId: async (facilityId, specialtyId) => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -278,6 +295,39 @@ const Doctor = {
         doctorId,
       ]);
       return result;
+    } catch (err) {
+      throw err;
+    }
+  },
+  createByUserId: async ({ user_id, facility_id, specialty_id }) => {
+    try {
+      const sql = `
+        INSERT INTO doctor (user_id, facility_id, specialty_id)
+        VALUES (?, ?, ?)
+      `;
+      const [result] = await conn.query(sql, [
+        user_id,
+        facility_id,
+        specialty_id,
+      ]);
+      return {
+        success: true,
+        doctorId: result.insertId,
+        message: "Doctor created successfully",
+      };
+    } catch (err) {
+      throw err;
+    }
+  },
+  getByUserId: async (userId) => {
+    try {
+      const sql = `
+        SELECT d.id as doctor_id, d.facility_id, d.specialty_id
+        FROM doctor AS d
+        WHERE d.user_id = ?
+      `;
+      const [result] = await conn.query(sql, [userId]);
+      return result[0] || null;
     } catch (err) {
       throw err;
     }

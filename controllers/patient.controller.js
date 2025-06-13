@@ -27,6 +27,21 @@ const patientController = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  getByUserId: async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const patient = await PatientModel.getByUserId(userId);
+      if (patient) {
+        return res.status(200).json({ success: true, patient });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "Patient not found" });
+      }
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  },
   update: async (req, res) => {
     try {
       const patientData = req.body; // Lấy dữ liệu cập nhật từ body request
@@ -45,6 +60,16 @@ const patientController = {
         .json({ success: true, message: "Patient updated successfully" });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
+    }
+  },
+  updateById: async (req, res) => {
+    try {
+      const result = await PatientModel.updateById(req.params.id, req.body);
+      res
+        .status(200)
+        .json({ success: true, message: "Patient updated successfully" });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
     }
   },
   changeAvt: async (req, res) => {

@@ -129,6 +129,7 @@ const authenController = {
   getDoctorByToken: async (req, res) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
+      console.log(token);
       if (!token) {
         return res
           .status(401)
@@ -139,7 +140,7 @@ const authenController = {
       const jwt = require("jsonwebtoken");
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const username = decoded.username;
-
+      console.log(decoded);
       if (!username) {
         return res
           .status(400)
@@ -147,7 +148,7 @@ const authenController = {
       }
 
       const doctor = await Doctor.getDoctorByUsername(username);
-
+      console.log(doctor);
       if (!doctor) {
         return res
           .status(404)

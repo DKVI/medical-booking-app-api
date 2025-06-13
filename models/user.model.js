@@ -38,6 +38,25 @@ const User = {
       throw error;
     }
   },
+  deleteById: async (id) => {
+    try {
+      // Xóa doctor nếu tồn tại
+      await conn.query("DELETE FROM doctor WHERE user_id = ?", [id]);
+      // Xóa patient nếu tồn tại
+      await conn.query("DELETE FROM patient WHERE user_id = ?", [id]);
+      // Xóa user
+      const [result] = await conn.query("DELETE FROM user WHERE id = ?", [id]);
+      return {
+        success: result.affectedRows > 0,
+        message:
+          result.affectedRows > 0
+            ? "User deleted successfully"
+            : "User not found",
+      };
+    } catch (err) {
+      throw err;
+    }
+  },
 
   activeAccount: async (token) => {
     try {
@@ -436,6 +455,82 @@ const User = {
     } catch (error) {
       console.error("Error creating user:", error.message);
       throw error;
+    }
+  },
+
+  // ...existing code...
+  updateById: async (id, data) => {
+    try {
+      const fields = [];
+      const values = [];
+
+      if (data.username !== undefined) {
+        fields.push("username = ?");
+        values.push(data.username);
+      }
+      if (data.password !== undefined) {
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        fields.push("password = ?");
+        values.push(hashedPassword);
+      }
+      if (data.fullname !== undefined) {
+        fields.push("fullname = ?");
+        values.push(data.fullname);
+      }
+      if (data.identity_no !== undefined) {
+        fields.push("identity_no = ?");
+        values.push(data.identity_no);
+      }
+      if (data.phone_no !== undefined) {
+        fields.push("phone_no = ?");
+        values.push(data.phone_no);
+      }
+      if (data.email !== undefined) {
+        fields.push("email = ?");
+        values.push(data.email);
+      }
+      if (data.role !== undefined) {
+        fields.push("role = ?");
+        values.push(data.role);
+      }
+      if (data.status !== undefined) {
+        fields.push("status = ?");
+        values.push(data.status);
+      }
+      if (data.gender !== undefined) {
+        fields.push("gender = ?");
+        values.push(data.gender);
+      }
+      if (data.avatar !== undefined) {
+        fields.push("avatar = ?");
+        values.push(data.avatar);
+      }
+      if (data.dob !== undefined) {
+        fields.push("dob = ?");
+        values.push(data.dob);
+      }
+      if (data.address !== undefined) {
+        fields.push("address = ?");
+        values.push(data.address);
+      }
+
+      if (fields.length === 0) {
+        return { success: false, message: "No data to update" };
+      }
+
+      const sql = `UPDATE user SET ${fields.join(", ")} WHERE id = ?`;
+      values.push(id);
+
+      const [result] = await conn.query(sql, values);
+      return {
+        success: result.affectedRows > 0,
+        message:
+          result.affectedRows > 0
+            ? "User updated successfully"
+            : "User not found or no changes made",
+      };
+    } catch (err) {
+      throw err;
     }
   },
 };

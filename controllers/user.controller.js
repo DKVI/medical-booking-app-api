@@ -47,6 +47,27 @@ const userController = {
       return res.status(500).json({ success: false, message: err.message });
     }
   },
+  deleteById: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const result = await User.deleteById(id);
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  },
+  updateById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = await User.updateById(id, req.body);
+      if (!result.success) {
+        return res.status(404).json(result);
+      }
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
 };
 
 module.exports = userController;

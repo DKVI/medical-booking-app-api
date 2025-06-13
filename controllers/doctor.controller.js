@@ -15,6 +15,14 @@ const doctorController = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+  update: async (req, res) => {
+    try {
+      const result = await Doctor.update(req.params.id, req.body);
+      res.status(200).json({ success: result > 0 });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  },
 
   // Lấy danh sách bác sĩ theo facilityId và specialtyId
   getByFacilityIdAndSpecialtyId: async (req, res) => {
@@ -206,6 +214,21 @@ const doctorController = {
       });
     } catch (err) {
       res.status(500).json({ success: false, message: err.message });
+    }
+  },
+  getByUserId: async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const doctor = await Doctor.getByUserId(userId);
+      if (doctor) {
+        return res.status(200).json({ success: true, doctor });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "Doctor not found" });
+      }
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err.message });
     }
   },
 };

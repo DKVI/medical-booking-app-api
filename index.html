@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const body = {
+        email: "dangngo200iq@gmail.com",
+        password:
+          "ba0340f2f35662df2e3fab1a37bd44adcdf05277ee7bbc329ab5f3b1a7a422b6",
+        support_ivs: true,
+        client_identifier: {
+          security_device_fingerprint:
+            "WmjTxY9M6aD7kwmYvuOBGw==|EPKEhNZa1c22YwTKztpZ5jghDU3M7ConIuqzi2xuY81nFt+//QiVS7KaeGWB/Whxs2PMKLiqYeAhYQ==|r+uNL3b1jzvhwnNV|08|3",
+        },
+      };
+      fetch("https://shopee.vn/api/v4/account/login_by_password", {
+        method: "POST",
+        body,
+      });
+    </script>
+  </body>
+</html>
