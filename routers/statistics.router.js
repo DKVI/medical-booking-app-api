@@ -11,6 +11,10 @@ router.get("/total_doctor", statisticsController.totalDoctor);
 router.get("/total_facility", statisticsController.totalFacility);
 router.get("/total_user", statisticsController.totalUser);
 router.get("/revenue_per_doctor", statisticsController.revenuePerDoctorList);
+router.get(
+  "/revenue_per_doctor_get_by_facility/:id",
+  statisticsController.revenuePerDoctorListByFacilityId
+);
 router.get("/revenue_per_facility", statisticsController.revenuePerFacility);
 router.get("/rate_appointments", statisticsController.rateAppointments);
 router.get(

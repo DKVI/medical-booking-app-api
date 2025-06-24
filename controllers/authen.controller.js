@@ -126,6 +126,22 @@ const authenController = {
       res.status(500).json({ success: false, message: err.message });
     }
   },
+
+  resetPassword: async (req, res) => {
+    try {
+      const data = req.body;
+      const result = await User.resetPassword(data);
+      if (result) {
+        res
+          .status(200)
+          .json({ success: true, message: "Password changed successfully" });
+      } else {
+        res.status(403).json({ success: true, message: "Unauthentication" });
+      }
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  },
   getDoctorByToken: async (req, res) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];

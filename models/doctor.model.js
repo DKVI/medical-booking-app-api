@@ -45,6 +45,7 @@ const Doctor = {
       }
     });
   },
+  
 
   update: async (id, data) => {
     return new Promise(async (resolve, reject) => {

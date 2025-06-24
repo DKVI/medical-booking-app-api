@@ -113,6 +113,26 @@ const Statistics = {
       throw err;
     }
   },
+  revenuePerDoctorByFacilityId: async (id) => {
+    try {
+      const sql = `SELECT 
+                    d.id AS doctor_id,
+                    u.fullname AS doctor_name,
+                    COALESCE(SUM(CASE WHEN p.status = 'Purchased' THEN p.total ELSE 0 END), 0) AS total_income
+                    FROM doctor AS d
+                    INNER JOIN user AS u ON u.id = d.user_id
+                    LEFT JOIN scheduling_detail AS sd ON d.id = sd.doctor_id
+                    LEFT JOIN purchase AS p ON sd.id = p.scheduling_details_id
+                    WHERE d.facility_id = ?
+                    GROUP BY d.id, u.fullname
+                    ORDER BY total_income DESC LIMIT 10;`;
+      const [result] = await conn.query(sql, [id]);
+      return result;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  },
   revenuePerFacility: async () => {
     try {
       const sql = `SELECT 

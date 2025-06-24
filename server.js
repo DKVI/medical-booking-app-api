@@ -7,7 +7,11 @@ app.use(express.json());
 // Configure CORS
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"], // Allow only this origin
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://medical-booking-app-client.vercel.app",
+    ], // Allow only this origin
   })
 );
 

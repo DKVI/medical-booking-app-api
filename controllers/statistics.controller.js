@@ -67,6 +67,18 @@ const statisticsController = {
         .json({ success: false, message: "Server got some error!" });
     }
   },
+  revenuePerDoctorListByFacilityId: async (req, res) => {
+    try {
+      const result = await Statistics.revenuePerDoctorByFacilityId(
+        req.params.id
+      );
+      return res.status(200).json({ success: true, total: result });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Server got some error!" });
+    }
+  },
   revenuePerFacility: async (req, res) => {
     try {
       const result = await Statistics.revenuePerFacility();

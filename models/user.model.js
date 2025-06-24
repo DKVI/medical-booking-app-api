@@ -12,6 +12,21 @@ const User = {
       throw err;
     }
   },
+  resetPassword: async ({ username, email, newPassword }) => {
+    try {
+      const sql =
+        "UPDATE user SET password = ? WHERE username = ? AND email = ?";
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      const [result] = await conn.query(sql, [
+        hashedNewPassword,
+        username,
+        email,
+      ]);
+      return result.affectedRows > 0;
+    } catch (err) {
+      throw err;
+    }
+  },
   createAccount: async (username, password, email) => {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);

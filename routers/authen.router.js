@@ -11,4 +11,5 @@ router.get("/getbytoken", authenController.getByToken);
 router.post("/change-password", authenController.changePassword);
 router.post("/doctor/login", authenController.loginDoctor);
 router.get("/doctor/getByToken", authenController.getDoctorByToken);
+router.put("/reset-password/", authenController.resetPassword);
 module.exports = router;
